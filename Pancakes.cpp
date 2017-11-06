@@ -8,6 +8,8 @@
 #include "pancakes.hpp"
 #include <sstream>
 #include <utility> // for pair
+#include <unordered_set>
+
 
 using std::cout;
 using std::cin;
@@ -93,9 +95,10 @@ void astar_pancake_sort(const stack_type& pancakes, flip_type& flips) {
 
     p_queue.insert(initial_stack); //First call
 
-    std::vector<string> stringStackVector;
 
-    std::vector<string>::iterator foundString;
+    std::unordered_set<string> stringStackVector;
+
+    std::unordered_set<string>::iterator foundString;
 
     while(!std::equal(parent_stack.first.first.begin(),parent_stack.first.first.end(),sorted_stack.begin())) {
 
@@ -113,7 +116,7 @@ void astar_pancake_sort(const stack_type& pancakes, flip_type& flips) {
         }
 //
 //     	cout << "Pushing parent into the stringStackVector" << endl;
-            stringStackVector.push_back(stackToString(parent_stack));
+        stringStackVector.insert(stackToString(parent_stack));
 
         // generate children from parent stack
         for(stack_type::size_type i = 1; i < parent_stack.first.first.size(); i++) { // generate children from parent stack
