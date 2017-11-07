@@ -23,7 +23,11 @@ int main()
     v.push_back(0);
 
 
-
+std::cout << "Initial Stack : " << std::endl;
+for(stack_type::iterator iter = v.begin(); iter != v.end() ; iter++ ) {
+    std::cout << ' '<< *iter ;
+}
+std::cout << '' << std::endl;
 
 std::cout << " **********Simple Pancake sort *********** " << std::endl;
 simple_pancake_sort(v,flipsS);
