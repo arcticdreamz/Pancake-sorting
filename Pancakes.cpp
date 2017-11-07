@@ -93,9 +93,9 @@ void astar_pancake_sort(const stack_type& pancakes, flip_type& flips) {
 
     p_queue.insert(initial_stack); //First call
 
-    std::vector<string> stringStackVector;
+    set<string> stringStackVector;
 
-    std::vector<string>::iterator foundString;
+    set<string>::iterator foundString;
 
     while(!std::equal(parent_stack.first.first.begin(),parent_stack.first.first.end(),sorted_stack.begin())) {
 
@@ -103,17 +103,19 @@ void astar_pancake_sort(const stack_type& pancakes, flip_type& flips) {
         	parent_stack = *(p_queue.begin()); //Extract from the priority queue
             p_queue.erase(p_queue.begin()); //Delete the extracted element from the priority queue
         }
-        //Looking in the stringStackVector if the stack hasn't already been encountered
-        foundString = std::find(stringStackVector.begin(), stringStackVector.end(),stackToString(parent_stack));
 
-//    	If the stack has indeed already been encountered before, we just loop again
-      	if(foundString != stringStackVector.end()){
-//            cout << *foundString << " has already been generated" << endl;
-            continue;
+        if(stringStackVector.empty()) {
+        	stringStackVector.insert(stackToString(initial_stack));
+        }else{
+        	//Looking in the stringStackVector if the stack hasn't already been encountered
+	        foundString = std::find(stringStackVector.begin(), stringStackVector.end(),stackToString(parent_stack));
+	      	if(foundString != stringStackVector.end()){
+	//            cout << *foundString << " has already been generated" << endl;
+	            continue;
+			}
         }
-//
-//     	cout << "Pushing parent into the stringStackVector" << endl;
-            stringStackVector.push_back(stackToString(parent_stack));
+     	//cout << "Pushing parent into the stringStackVector" << endl;
+        stringStackVector.insert(stackToString(parent_stack));
 
         // generate children from parent stack
         for(stack_type::size_type i = 1; i < parent_stack.first.first.size(); i++) { // generate children from parent stack
@@ -122,8 +124,6 @@ void astar_pancake_sort(const stack_type& pancakes, flip_type& flips) {
 
             child_stack.first.second.push_back(i); //Pushing the flip
             std::reverse(child_stack.first.first.begin(),child_stack.first.first.begin()+ 1 + i); // flip at index i (i+1 because reverse() second argument is non-inclusive)
-
-
 
             //Looking in the stringStackVector if the stack hasn't already been encountered
             foundString = std::find(stringStackVector.begin(), stringStackVector.end(),stackToString(child_stack));
