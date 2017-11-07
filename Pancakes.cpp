@@ -107,7 +107,8 @@ void astar_pancake_sort(const stack_type& pancakes, flip_type& flips) {
 
         if(stringStackSet.empty()) {
         	stringStackSet.insert(stackToString(initial_stack));
-        }else{
+        }
+/*       else{
         	//Looking in the stringStackSet if the stack hasn't already been encountered
 	        foundString = std::find(stringStackSet.begin(), stringStackSet.end(),stackToString(parent_stack));
 	      	if(foundString != stringStackSet.end()){
@@ -115,6 +116,7 @@ void astar_pancake_sort(const stack_type& pancakes, flip_type& flips) {
 	            continue;
 			}
         }
+ */       
      	//cout << "Pushing parent into the stringStackSet" << endl;
         stringStackSet.insert(stackToString(parent_stack));
 
@@ -163,43 +165,28 @@ void simple_pancake_sort(const stack_type& pancakes, flip_type& flips){
     stack_type::size_type i = 0;
     stack_type::iterator maximum;
 
-
-
     std::copy(pancakes.begin(),pancakes.end(),back_inserter(copied));
-
-
-//    while(i < copied.size()){
-//
-//
-//        maximum = max_element(copied.begin(),copied.end()- i );
-//        flips.push_back(distance(copied.begin(),maximum));
-//
-//        std::reverse(copied.begin(),++maximum); // push max to the top
-//        std::reverse(copied.begin(),copied.end()-i); // put the max at it's place
-//        flips.push_back(distance(copied.begin(),copied.end()-i-1));
-//        i++;
-//    }
-
 
     while(copied.size() != 0){
 
+	    maximum = getMax(copied);
+	    if(maximum != copied.begin()) { 
+		    flips.push_back(distance(copied.begin(),maximum));
+		    std::reverse(copied.begin(),++maximum); // push max to the top       
+		}
 
-        maximum = getMax(copied);
-//        if(maximum == copied.begin()) {
-//                break;
-//        }
-        flips.push_back(distance(copied.begin(),maximum));
+	    std::reverse(copied.begin(),copied.end()); // flip the whole stack
+	    copied.pop_back();
 
-        std::reverse(copied.begin(),++maximum); // push max to the top
-        std::reverse(copied.begin(),copied.end()); // put the max at it's place
-        copied.pop_back();
-        flips.push_back(distance(copied.begin(),copied.end()));
+	    if(distance(copied.begin(),copied.end()) != 0){
+		    flips.push_back(distance(copied.begin(),copied.end()));
+	    }
     }
     cout << "The flip vector contains :";
     for(i = 0; i< flips.size();i++) {
         cout << ' ' << flips[i];
-    }
-    cout << endl;
+	}
+	cout << endl;
 
 }
 
