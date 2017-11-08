@@ -7,7 +7,6 @@
 #include <iterator>
 #include <set>
 #include <string>
-#include "pancakes.hpp"
 #include <sstream>
 #include <utility>
 

@@ -10,7 +10,7 @@
 #include <sstream>
  #include <utility> // for pair
 #include <tuple>
-#include <unordered_map>
+#include <unordered_set>
 
 using std::cout;
 using std::cin;
@@ -19,6 +19,7 @@ using std::pair;
 using std::set;
 using std::string;
 using std::get;
+using std::unordered_set;
 
 
 //typedef pair<int,int> cost;
@@ -74,7 +75,7 @@ long long stackHash(pancake_stack& stackA) {
             //std::cout << intHash << std::endl;
 	}
 
-return intHash+ 1 ; //+1 car on perd de la precision
+return intHash+ 1 ; // +1 car on perd de la precision
 }
 
 //long long stackHash(pancake_stack& stackA) {
@@ -122,9 +123,9 @@ void astar_pancake_sort(const stack_type& pancakes, flip_type& flips) {
 
     p_queue.insert(initial_stack); //First call
 
-    std::unordered_map<int,int> StackMap;
+    unordered_set<long long> StackSet;
 
-    std::pair<std::unordered_map<int,int>::iterator,bool> foundStack;
+    std::pair<unordered_set<long long>::iterator,bool> foundStack;
 
     while(!std::is_sorted(get<2>(parent_stack).begin(),get<2>(parent_stack).end())) {
 
@@ -133,8 +134,8 @@ void astar_pancake_sort(const stack_type& pancakes, flip_type& flips) {
             p_queue.erase(p_queue.begin()); //Delete the extracted element from the priority queue
         }
 
-        if(StackMap.empty()) {
-        	foundStack = StackMap.insert(std::pair<int,int>(stackHash(initial_stack),1));
+        if(StackSet.empty()) {
+        	foundStack = StackSet.insert(stackHash(initial_stack));
         }
 
 
@@ -146,8 +147,8 @@ void astar_pancake_sort(const stack_type& pancakes, flip_type& flips) {
             get<3>(child_stack).push_back(i); //Pushing the flip
             std::reverse(get<2>(child_stack).begin(),get<2>(child_stack).begin()+ 1 + i); // flip at index i (i+1 because reverse() second argument is non-inclusive)
 
-            //Looking in the StackMap if the stack hasn't already been encountered
-           	foundStack = StackMap.insert(std::pair<int,int>(stackHash(child_stack),1));
+            //Looking in the StackSet if the stack hasn't already been encountered
+        	foundStack = StackSet.insert(stackHash(child_stack));
             //If the stack has indeed already been inserted, we just loop again
             if(foundStack.second == false){
                 continue;
@@ -256,9 +257,9 @@ void simple_pancake_sort(const stack_type& pancakes, flip_type& flips){
 //
 
 
-//    cout << "The StackMap contains : " <<  endl;
-//   sort(StackMap.begin(),StackMap.end());
-//    for(std::vector<string>::iterator it = StackMap.begin(); it != StackMap.end() ; it++ ) {
+//    cout << "The StackSet contains : " <<  endl;
+//   sort(StackSet.begin(),StackSet.end());
+//    for(std::vector<string>::iterator it = StackSet.begin(); it != StackSet.end() ; it++ ) {
 //        cout << ' '<<*it << endl; ;
 //    }
 //    cout << endl;
