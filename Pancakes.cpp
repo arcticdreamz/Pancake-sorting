@@ -1,4 +1,5 @@
 
+
 #include <iostream>
 #include <algorithm>
 #include <vector>
@@ -7,8 +8,9 @@
 #include <string>
 #include "pancakes.hpp"
 #include <sstream>
-#include <utility> // for pair
+ #include <utility> // for pair
 #include <tuple>
+#include <unordered_map>
 
 using std::cout;
 using std::cin;
@@ -23,7 +25,7 @@ using std::get;
 //typedef pair<stack_type,flip_type> pancake_stack_raw;
 //typedef pair<pair<stack_type,flip_type>,pair<int,int> > pancake_stack;
 
-typedef std::tuple<int,int,stack_type,flip_type> pancake_stack; // real cost, cout est, 
+typedef std::tuple<int,int,stack_type,flip_type> pancake_stack; // real cost, cout est,
 
 //Compare function for the set
  bool comp(const pancake_stack stackA, const pancake_stack stackB){
@@ -31,10 +33,10 @@ typedef std::tuple<int,int,stack_type,flip_type> pancake_stack; // real cost, co
      int totalCostA = get<0>(stackA)+ get<1>(stackA);
      int totalCostB = get<0>(stackB)+ get<1>(stackB);
      if(totalCostA == totalCostB){
-         return stackA < stackB;
+        return stackA < stackB;
      }
      return totalCostA < totalCostB ;
- }	
+ }
 
 
 // Get the estimated cost of a stack; the size of the largest pancake not yet at its place
@@ -58,13 +60,39 @@ int getEstCost(pancake_stack& stackA)  {
 
 
 
-string stackToString(pancake_stack& stackA) {
-	stack_type vector = get<2>(stackA);
-	std::stringstream result;
-	std::copy(vector.begin(), vector.end(), std::ostream_iterator<int>(result, ""));
-	std::string pancakestring = result.str();
-	return pancakestring;
+long long stackHash(pancake_stack& stackA) {
+    stack_type v = get<2>(stackA);
+
+    long long intHash = 0;
+    stack_type::reverse_iterator riter = v.rbegin();
+
+    unsigned int i = 0;
+    while(i < v.size() && riter != v.rend()) {
+            intHash += (*riter) * pow(10,i);
+            riter++;
+            i++;
+            //std::cout << intHash << std::endl;
+	}
+
+return intHash+ 1 ; //+1 car on perd de la precision
 }
+
+//long long stackHash(pancake_stack& stackA) {
+//    stack_type v = get<2>(stackA);
+//
+//    long long intHash = 1;
+//    stack_type::reverse_iterator riter = v.rbegin();
+//    int R = 17790;
+//    unsigned int i = 0;
+//    while(i < v.size() && riter != v.rend()) {
+//            intHash *= 2*(*riter) + R;
+//            riter++;
+//            i++;
+//            //std::cout << intHash << std::endl;
+//	}
+//
+//return intHash/2 ; //+1 car on perd de la precision
+//}
 
 
 
@@ -94,31 +122,21 @@ void astar_pancake_sort(const stack_type& pancakes, flip_type& flips) {
 
     p_queue.insert(initial_stack); //First call
 
-    set<string> stringStackSet;
+    std::unordered_map<int,int> StackMap;
 
-    set<string>::iterator foundString;
+    std::pair<std::unordered_map<int,int>::iterator,bool> foundStack;
 
-    while(!std::equal(get<2>(parent_stack).begin(),get<2>(parent_stack).end(),sorted_stack.begin())) {
+    while(!std::is_sorted(get<2>(parent_stack).begin(),get<2>(parent_stack).end())) {
 
         if(!p_queue.empty()){ //don't want to dereference end pointer
         	parent_stack = *(p_queue.begin()); //Extract from the priority queue
             p_queue.erase(p_queue.begin()); //Delete the extracted element from the priority queue
         }
 
-        if(stringStackSet.empty()) {
-        	stringStackSet.insert(stackToString(initial_stack));
+        if(StackMap.empty()) {
+        	foundStack = StackMap.insert(std::pair<int,int>(stackHash(initial_stack),1));
         }
-/*       else{
-        	//Looking in the stringStackSet if the stack hasn't already been encountered
-	        foundString = std::find(stringStackSet.begin(), stringStackSet.end(),stackToString(parent_stack));
-	      	if(foundString != stringStackSet.end()){
-	//            cout << *foundString << " has already been generated" << endl;
-	            continue;
-			}
-        }
- */       
-     	//cout << "Pushing parent into the stringStackSet" << endl;
-        stringStackSet.insert(stackToString(parent_stack));
+
 
         // generate children from parent stack
         for(stack_type::size_type i = 1; i < get<2>(parent_stack).size(); i++) { // generate children from parent stack
@@ -128,11 +146,10 @@ void astar_pancake_sort(const stack_type& pancakes, flip_type& flips) {
             get<3>(child_stack).push_back(i); //Pushing the flip
             std::reverse(get<2>(child_stack).begin(),get<2>(child_stack).begin()+ 1 + i); // flip at index i (i+1 because reverse() second argument is non-inclusive)
 
-            //Looking in the stringStackSet if the stack hasn't already been encountered
-            foundString = std::find(stringStackSet.begin(), stringStackSet.end(),stackToString(child_stack));
-
-            //If the stack has indeed already been encountered before, we just loop again
-            if(foundString != stringStackSet.end()){
+            //Looking in the StackMap if the stack hasn't already been encountered
+           	foundStack = StackMap.insert(std::pair<int,int>(stackHash(child_stack),1));
+            //If the stack has indeed already been inserted, we just loop again
+            if(foundStack.second == false){
                 continue;
             }
 
@@ -170,17 +187,17 @@ void simple_pancake_sort(const stack_type& pancakes, flip_type& flips){
     while(copied.size() != 0){
 
 	    maximum = getMax(copied);
-	    if(maximum != copied.begin()) { 
+//	    if(maximum != copied.begin()) {
 		    flips.push_back(distance(copied.begin(),maximum));
-		    std::reverse(copied.begin(),++maximum); // push max to the top       
-		}
+		    std::reverse(copied.begin(),++maximum); // push max to the top
+//		}
 
 	    std::reverse(copied.begin(),copied.end()); // flip the whole stack
 	    copied.pop_back();
 
-	    if(distance(copied.begin(),copied.end()) != 0){
+//	    if(distance(copied.begin(),copied.end()) != 0){
 		    flips.push_back(distance(copied.begin(),copied.end()));
-	    }
+//	    }
     }
     cout << "The flip vector contains :";
     for(i = 0; i< flips.size();i++) {
@@ -212,15 +229,15 @@ void simple_pancake_sort(const stack_type& pancakes, flip_type& flips){
 //    static int number = 0;
 //
 //    cout << pancakestring<< endl;
-//    pair<map<std::string,int>::iterator,bool> ret;
-//    ret = poppedStacksMap.insert (pair<std::string,int>(pancakestring,number));
+//    pair<map<std::string,int>::iterator,bool> foundStack;
+//    foundStack = poppedStacksMap.insert (pair<std::string,int>(pancakestring,number));
 //    number++;
-//    if(ret.second == true){
+//    if(foundStack.second == true){
 //        number--;
 //        cout << "element 'z' already existed";
-//        cout << " with a value of " << ret.first->second << '\n';
+//        cout << " with a value of " << foundStack.first->second << '\n';
 //    }
-//    return ret.second;
+//    return foundStack.second;
 //
 //}
 
@@ -239,9 +256,9 @@ void simple_pancake_sort(const stack_type& pancakes, flip_type& flips){
 //
 
 
-//    cout << "The stringStackSet contains : " <<  endl;
-//   sort(stringStackSet.begin(),stringStackSet.end());
-//    for(std::vector<string>::iterator it = stringStackSet.begin(); it != stringStackSet.end() ; it++ ) {
+//    cout << "The StackMap contains : " <<  endl;
+//   sort(StackMap.begin(),StackMap.end());
+//    for(std::vector<string>::iterator it = StackMap.begin(); it != StackMap.end() ; it++ ) {
 //        cout << ' '<<*it << endl; ;
 //    }
 //    cout << endl;
