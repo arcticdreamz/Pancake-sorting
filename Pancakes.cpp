@@ -184,27 +184,26 @@ void simple_pancake_sort(const stack_type& pancakes, flip_type& flips){
     stack_type::iterator maximum;
 
     std::copy(pancakes.begin(),pancakes.end(),back_inserter(copied));
+    if(!is_sorted(copied.begin(), copied.end())) {
+	    while(copied.size() != 0){
 
-    while(copied.size() != 0){
+		    maximum = getMax(copied);
+		    if(maximum == copied.begin()) {
+			    std::reverse(copied.begin(),copied.end()); // flip the whole stack
+			    flips.push_back(distance(copied.begin(),copied.end()));
 
-	    maximum = getMax(copied);
-//	    if(maximum != copied.begin()) {
-		    flips.push_back(distance(copied.begin(),maximum));
-		    std::reverse(copied.begin(),++maximum); // push max to the top
-//		}
-
-	    std::reverse(copied.begin(),copied.end()); // flip the whole stack
-	    copied.pop_back();
-
-//	    if(distance(copied.begin(),copied.end()) != 0){
-		    flips.push_back(distance(copied.begin(),copied.end()));
-//	    }
-    }
-    cout << "The flip vector contains :";
-    for(i = 0; i< flips.size();i++) {
-        cout << ' ' << flips[i];
+			} else if(maximum != copied.end()-1){
+			    flips.push_back(distance(copied.begin(),maximum));
+			    std::reverse(copied.begin(),++maximum); // push max to the top
+		    }
+		    copied.pop_back();
+	    }
 	}
-	cout << endl;
+	    cout << "The flip vector contains :";
+	    for(i = 0; i< flips.size();i++) {
+	        cout << ' ' << flips[i];
+		}
+		cout << endl;
 
 }
 
