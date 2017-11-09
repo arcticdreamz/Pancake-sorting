@@ -107,9 +107,6 @@ void astar_pancake_sort(const stack_type& pancakes, flip_type& flips) {
     //Initialise the stacks
     pancake_stack initial_stack = std::make_tuple(0,0,pancakes_copy,flips);
 
-    //Create a sorted stack to compare
-    stack_type sorted_stack = pancakes_copy;
-    sort(sorted_stack.begin(),sorted_stack.end());
 
 
     pancake_stack parent_stack = initial_stack;
