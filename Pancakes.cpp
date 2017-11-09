@@ -100,7 +100,6 @@ return intHash+ 1 ; // +1 car on perd de la precision
 void astar_pancake_sort(const stack_type& pancakes, flip_type& flips) {
 
     stack_type pancakes_copy;
-    stack_type::iterator iter;
 
     // Pointer to the comparison function
     bool(*comp_pt)(const pancake_stack, const pancake_stack) = comp;
@@ -134,7 +133,7 @@ void astar_pancake_sort(const stack_type& pancakes, flip_type& flips) {
             p_queue.erase(p_queue.begin()); //Delete the extracted element from the priority queue
         }
 
-        if(StackSet.empty()) {
+        if(StackSet.empty()) { //Insert the initial stack into the set
         	foundStack = StackSet.insert(stackHash(initial_stack));
         }
 
@@ -144,7 +143,6 @@ void astar_pancake_sort(const stack_type& pancakes, flip_type& flips) {
 
             pancake_stack child_stack = parent_stack;
 
-            get<3>(child_stack).push_back(i); //Pushing the flip
             std::reverse(get<2>(child_stack).begin(),get<2>(child_stack).begin()+ 1 + i); // flip at index i (i+1 because reverse() second argument is non-inclusive)
 
             //Looking in the StackSet if the stack hasn't already been encountered
@@ -154,9 +152,12 @@ void astar_pancake_sort(const stack_type& pancakes, flip_type& flips) {
                 continue;
             }
 
+            get<3>(child_stack).push_back(i); //Pushing the flip
+
             //Computing the cost
             int realCost = i+1; // i+1 pancakes were flipped
             int estCost = getEstCost(child_stack); //Compute the estimated end cost
+
             get<0>(child_stack) += realCost; // Add the child's realCost to the parent's realCost
             get<1>(child_stack) = estCost;
 
@@ -173,6 +174,11 @@ void astar_pancake_sort(const stack_type& pancakes, flip_type& flips) {
     }
     cout << endl;
 
+    cout << "Output array: ";
+    for(stack_type::iterator iter = get<2>(parent_stack).begin(); iter != get<2>(parent_stack).end() ; iter++ ) {
+        cout << ' '<<*iter ;
+    }
+
 
 }
 
@@ -188,6 +194,7 @@ void simple_pancake_sort(const stack_type& pancakes, flip_type& flips){
 	    while(copied.size() != 0){
 
 		    maximum = getMax(copied);
+		    
 		    if(maximum == copied.begin()) {
 			    std::reverse(copied.begin(),copied.end()); // flip the whole stack
 			    flips.push_back(distance(copied.begin(),copied.end()));
