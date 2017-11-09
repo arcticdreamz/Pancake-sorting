@@ -61,27 +61,21 @@ int getEstCost(pancake_stack& stackA)  {
 
 
 
-long long stackHash(pancake_stack& stackA) {
+size_t stackHash(const pancake_stack& stackA) {
     stack_type v = get<2>(stackA);
 
-    long long intHash = 0;
-    stack_type::reverse_iterator riter = v.rbegin();
-
-    unsigned int i = 0;
-    while(i < v.size() && riter != v.rend()) {
-            intHash += (*riter) * pow(10,i);
-            riter++;
-            i++;
-            //std::cout << intHash << std::endl;
-	}
-
-return intHash+ 1 ; // +1 car on perd de la precision
+    std::hash<int> hasher;
+    size_t value = 0;
+    for (int i : v) {
+        value ^= hasher(i) + 0x9e3779b9 + (value<<6) + (value>>2);
+    }
+    return value;
 }
 
-//long long stackHash(pancake_stack& stackA) {
+//size_t stackHash(pancake_stack& stackA) {
 //    stack_type v = get<2>(stackA);
 //
-//    long long intHash = 1;
+//    size_t intHash = 1;
 //    stack_type::reverse_iterator riter = v.rbegin();
 //    int R = 17790;
 //    unsigned int i = 0;
@@ -122,9 +116,9 @@ void astar_pancake_sort(const stack_type& pancakes, flip_type& flips) {
 
     p_queue.insert(initial_stack); //First call
 
-    unordered_set<long long> StackSet;
+    unordered_set<size_t> StackSet;
 
-    std::pair<unordered_set<long long>::iterator,bool> foundStack;
+    std::pair<unordered_set<size_t>::iterator,bool> foundStack;
 
     while(!std::is_sorted(get<2>(parent_stack).begin(),get<2>(parent_stack).end())) {
 
@@ -201,7 +195,11 @@ void simple_pancake_sort(const stack_type& pancakes, flip_type& flips){
 
 			} else if(maximum != copied.end()-1){
 			    flips.push_back(distance(copied.begin(),maximum));
-			    std::reverse(copied.begin(),++maximum); // push max to the top
+			    std::reverse(copied.begin(),++maximum); // push max to the bottom
+			    std::reverse(copied.begin(),copied.end()); // flip the whole stack
+		    	flips.push_back(distance(copied.begin(),copied.end()));
+
+
 		    }
 		    copied.pop_back();
 	    }
