@@ -182,19 +182,21 @@ void simple_pancake_sort(const stack_type& pancakes, flip_type& flips){
 
     std::copy(pancakes.begin(),pancakes.end(),back_inserter(copied));
     if(!is_sorted(copied.begin(), copied.end())) {
-	    while(copied.size() != 0){
+	    while(copied.size() != 1){
 
 		    maximum = getMax(copied);
 		    
 		    if(maximum == copied.begin()) {
+                flips.push_back(0);
+
 			    std::reverse(copied.begin(),copied.end()); // flip the whole stack
-			    flips.push_back(distance(copied.begin(),copied.end()));
+			    flips.push_back(distance(copied.begin(),copied.end()-1));
 
 			} else if(maximum != copied.end()-1){
 			    flips.push_back(distance(copied.begin(),maximum));
 			    std::reverse(copied.begin(),++maximum); // push max to the bottom
 			    std::reverse(copied.begin(),copied.end()); // flip the whole stack
-		    	flips.push_back(distance(copied.begin(),copied.end()));
+		    	flips.push_back(distance(copied.begin(),copied.end()-1));
 
 
 		    }
