@@ -99,7 +99,7 @@ simple_pancake_sort(v,flipsS);
 
 start_s = clock();
 std::cout << " **********A-star Pancake sort *********** " << std::endl;
-//astar_pancake_sort(v,flipsA);
+astar_pancake_sort(v,flipsA);
 stop_s = clock();
 
 double time = (stop_s - start_s)/double(CLOCKS_PER_SEC);

@@ -29,7 +29,7 @@ using std::unordered_set;
 typedef std::tuple<int,int,stack_type,flip_type> pancake_stack; // real cost, cout est,
 
 //Compare function for the set
- bool comp(const pancake_stack stackA, const pancake_stack stackB){
+ bool compare(const pancake_stack stackA, const pancake_stack stackB){
 
      int totalCostA = get<0>(stackA)+ get<1>(stackA);
      int totalCostB = get<0>(stackB)+ get<1>(stackB);
@@ -96,58 +96,54 @@ void astar_pancake_sort(const stack_type& pancakes, flip_type& flips) {
     stack_type pancakes_copy;
 
     // Pointer to the comparison function
-    bool(*comp_pt)(const pancake_stack, const pancake_stack) = comp;
+    bool(*compare_pt)(const pancake_stack, const pancake_stack) = compare;
 
     //Create the set
-    set<pancake_stack,bool(*)(pancake_stack,pancake_stack)> p_queue(comp_pt);
+    set<pancake_stack,bool(*)(pancake_stack,pancake_stack)> p_queue(compare_pt);
 
     //Copy the original pancakes
     std::copy(pancakes.begin(),pancakes.end(),back_inserter(pancakes_copy));
 
-    //Initialise the stacks
+    //Create and initialie the tuple
     pancake_stack initial_stack = std::make_tuple(0,0,pancakes_copy,flips);
 
+    pancake_stack parent_stack = initial_stack ;
+    //Inserting the first stack
+    p_queue.insert(initial_stack); 
 
-
-    pancake_stack parent_stack = initial_stack;
-
-    p_queue.insert(initial_stack); //First call
-
+    //Creating a container to store generated stacks
     unordered_set<size_t> StackSet;
-
     std::pair<unordered_set<size_t>::iterator,bool> foundStack;
+    //Insert the initial stack into the set
+    foundStack = StackSet.insert(stackHash(initial_stack));
 
     while(!std::is_sorted(get<2>(parent_stack).begin(),get<2>(parent_stack).end())) {
 
-        if(!p_queue.empty()){ //don't want to dereference end pointer
-        	parent_stack = *(p_queue.begin()); //Extract from the priority queue
-            p_queue.erase(p_queue.begin()); //Delete the extracted element from the priority queue
-        }
-
-        if(StackSet.empty()) { //Insert the initial stack into the set
-        	foundStack = StackSet.insert(stackHash(initial_stack));
+        //Extract the lowest cost stack 
+        if(!p_queue.empty()){ 
+        	parent_stack = *(p_queue.begin()); 
+            p_queue.erase(p_queue.begin()); 
         }
 
 
-        // generate children from parent stack
-        for(stack_type::size_type i = 1; i < get<2>(parent_stack).size(); i++) { // generate children from parent stack
+        //Generate children from parent stack
+        for(stack_type::size_type i = 1; i < get<2>(parent_stack).size(); i++) { 
 
             pancake_stack child_stack = parent_stack;
-
-            std::reverse(get<2>(child_stack).begin(),get<2>(child_stack).begin()+ 1 + i); // flip at index i (i+1 because reverse() second argument is non-inclusive)
+            //Flip the stack
+            std::reverse(get<2>(child_stack).begin(),get<2>(child_stack).begin()+ 1 + i); 
 
             //Looking in the StackSet if the stack hasn't already been encountered
         	foundStack = StackSet.insert(stackHash(child_stack));
-            //If the stack has indeed already been inserted, we just loop again
             if(foundStack.second == false){
                 continue;
             }
-
-            get<3>(child_stack).push_back(i); //Pushing the flip
+            //Pushing the flip
+            get<3>(child_stack).push_back(i); 
 
             //Computing the cost
             int realCost = i+1; // i+1 pancakes were flipped
-            int estCost = getEstCost(child_stack); //Compute the estimated end cost
+            int estCost = getEstCost(child_stack); 
 
             get<0>(child_stack) += realCost; // Add the child's realCost to the parent's realCost
             get<1>(child_stack) = estCost;
@@ -194,7 +190,7 @@ void simple_pancake_sort(const stack_type& pancakes, flip_type& flips){
 
 			} else if(maximum != copied.end()-1){
 			    flips.push_back(distance(copied.begin(),maximum));
-			    std::reverse(copied.begin(),++maximum); // push max to the bottom
+			    std::reverse(copied.begin(),++maximum); // flip the max to the top
 			    std::reverse(copied.begin(),copied.end()); // flip the whole stack
 		    	flips.push_back(distance(copied.begin(),copied.end()-1));
 
