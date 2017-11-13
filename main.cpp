@@ -66,7 +66,7 @@ int main()
 
 /*  for (int i = 0; i < 10 ; ++i){
         v.push_back(i);
-  }*/
+  }*/ //5739218064/
        v.push_back(1);
        v.push_back(9);
        v.push_back(5);
@@ -112,6 +112,21 @@ std::cout << "time: " << time << std::endl;
 
 
 /*
+
+size_t stackHash(const pancake_stack& stackA) {
+    stack_type v = get<2>(stackA);
+
+    size_t intHash = 0;
+    for (int i : v) {
+        intHash = intHash*10 + i;
+    }
+    std::cout << intHash << std::endl;
+
+    return intHash;
+}
+
+
+ 
 
 
 

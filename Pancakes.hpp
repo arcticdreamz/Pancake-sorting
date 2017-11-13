@@ -1,29 +1,35 @@
 #ifndef PANCAKES_H
 #define PANCAKES_H
 
-#include <iostream>
-#include <algorithm>
 #include <vector>
-#include <iterator>
-#include <set>
-#include <string>
-#include <sstream>
-#include <utility>
 
 typedef std::vector<int> stack_type;
 typedef std::vector<stack_type::size_type> flip_type;
 
+/* ------------------------------------------------------------------------- *
+ * Function that sorts a vector of ints using the prefix reversal method, 
+ * commonly knows as pancake sorting
+ * This function uses the naive approach to find the max, flip it on top
+ * then flip the whole stack over. This guarantees a fast method but it is
+ * not optimal.
+
+ * PARAMETERS
+ * - The vector of ints that needs to be sorted
+ * - One vector of ints that will contain the index where the stack was flipped
+ * ------------------------------------------------------------------------- */
 void simple_pancake_sort(const stack_type& pancakes, flip_type& flips);
+
+
+/* ------------------------------------------------------------------------- *
+ * Function that sorts a vector of ints using the prefix reversal method, 
+ * commonly knows as pancake sorting
+ * 
+ * This function uses the A*  algorithm to find the most optimal solution.
+
+ * PARAMETERS
+ * - The vector of ints that needs to be sorted
+ * - One vector of ints that will contain the indexes where the stack was flipped
+ * ------------------------------------------------------------------------- */
 void astar_pancake_sort(const stack_type& pancakes, flip_type& flips);
-
-stack_type::iterator findMax(stack_type& v);
-
-void flip(stack_type v, stack_type::iterator& flip_position);
-
-std::string stackToString(std::pair<std::pair<stack_type,flip_type>,std::pair<int,int> >& stackA);
-int getEstCost(std::pair<std::pair<stack_type,flip_type>,std::pair<int,int> >& stackA);
-bool comp(const std::pair<std::pair<stack_type,flip_type>,std::pair<int,int> > stackA, const std::pair<std::pair<stack_type,flip_type>,std::pair<int,int> > stackB);
-
-
 
 #endif // PANCAKES_H
