@@ -154,7 +154,8 @@ void astar_pancake_sort(const stack_type& pancakes, flip_type& flips) {
             p_queue.insert(child_stack);
         }
     }
-
+	
+	flips = get<3>(parent_stack);
     cout << "The size of the priority queue is : " << p_queue.size() << endl;
     cout << "The best cost was: " << get<0>(parent_stack) + get<1>(parent_stack) <<endl;
     cout << " The flips vector contains : ";
